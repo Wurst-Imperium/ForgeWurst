@@ -1,0 +1,16 @@
+[
+{
+  "modid": "forgewurst",
+  "name": "ForgeWurst",
+  "description": "Wurst Client for Minecraft Forge.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://forge.wurstclient.net/",
+  "updateJSON": "https://forge.wurstclient.net/api/v1/update.json",
+  "authorList": ["Alexander01998"],
+  "credits": "Copyright 2017 - 2018 Wurst-Imperium. All rights reserved.",
+  "logoFile": "assets/forgewurst/wurst-logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
