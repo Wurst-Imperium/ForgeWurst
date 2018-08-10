@@ -24,6 +24,14 @@ This repository only contains the source code and is not intended for end users.
 
 8. Both projects should now be working without any errors. In the future, you will need to repeat steps 5-7 for all projects except the one that hosts the shared source folder.
 
+## How To Compile The Project Into Runnable .JAR Files
+
+After you have set up the code in Eclipse by following the above steps, the `gradlew build` script will only work for ForgeWurst MC 1.12.2. To make it work with the other versions (currently just 1.10.2), you will first need to create a directory junction from `ForgeWurst\ForgeWurst MC 1.10.2\src\shared` to `ForgeWurst\ForgeWurst MC 1.12.2\src\shared`.
+
+1. Navigate to `ForgeWurst\ForgeWurst MC 1.10.2\src` and open the console. If you are using PowerShell, type `cmd` before continuing with step 2.
+
+2. Run the following command: `mklink /J shared "../../ForgeWurst MC 1.12.2/src/shared"`.
+
 ## Issues & Pull Requests
 
 Issues are disabled. Please [contact me](https://www.wurstclient.net/contact/) if you need help.
