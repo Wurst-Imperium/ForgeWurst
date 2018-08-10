@@ -30,6 +30,7 @@ public final class HackList extends WHackList
 {
 	public final AutoArmorHack autoArmorHack = register(new AutoArmorHack());
 	public final AutoFarmHack autoFarmHack = register(new AutoFarmHack());
+	public final AutoFishHack autoFishHack = register(new AutoFishHack());
 	public final AutoSprintHack autoSprintHack = register(new AutoSprintHack());
 	public final AutoSwimHack autoSwimHack = register(new AutoSwimHack());
 	public final AutoToolHack autoToolHack = register(new AutoToolHack());
