@@ -10,7 +10,9 @@ package net.wurstclient.forge.hacks;
 import java.lang.reflect.Method;
 
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
@@ -21,6 +23,7 @@ import net.wurstclient.fmlevents.WPacketInputEvent;
 import net.wurstclient.fmlevents.WUpdateEvent;
 import net.wurstclient.forge.Category;
 import net.wurstclient.forge.Hack;
+import net.wurstclient.forge.compatibility.WEnchantments;
 import net.wurstclient.forge.compatibility.WItem;
 import net.wurstclient.forge.compatibility.WMinecraft;
 import net.wurstclient.forge.utils.ChatUtils;
@@ -32,8 +35,9 @@ public final class AutoFishHack extends Hack
 	
 	public AutoFishHack()
 	{
-		super("AutoFish", "Automatically catches fish until\n"
-			+ "all of your fishing rods are\n" + "used up.");
+		super("AutoFish", "Automatically catches fish using your\n"
+			+ "best fishing rod. If it finds a better\n"
+			+ "rod while fishing, it will automatically\n" + "switch to it.");
 		setCategory(Category.OTHER);
 	}
 	
@@ -56,16 +60,32 @@ public final class AutoFishHack extends Hack
 		EntityPlayerSP player = event.getPlayer();
 		InventoryPlayer inventory = player.inventory;
 		
-		// select fishing rod in hotbar
-		int rodInHotbar = searchFishingRod(0, 9);
-		if(rodInHotbar != -1)
+		if(timer < 0)
 		{
-			if(inventory.currentItem != rodInHotbar)
-			{
-				inventory.currentItem = rodInHotbar;
-				return;
-			}
+			PlayerControllerUtils.windowClick_PICKUP(-timer);
+			timer = 15;
+			return;
+		}
+		
+		int bestRodValue =
+			getRodValue(inventory.getStackInSlot(inventory.currentItem));
+		int bestRodSlot = bestRodValue > -1 ? inventory.currentItem : -1;
+		
+		// search inventory for better rod
+		for(int slot = 0; slot < 36; slot++)
+		{
+			ItemStack stack = inventory.getStackInSlot(slot);
+			int rodValue = getRodValue(stack);
 			
+			if(rodValue > bestRodValue)
+			{
+				bestRodValue = rodValue;
+				bestRodSlot = slot;
+			}
+		}
+		
+		if(bestRodSlot == inventory.currentItem)
+		{
 			// wait for timer
 			if(timer > 0)
 			{
@@ -80,35 +100,35 @@ public final class AutoFishHack extends Hack
 			return;
 		}
 		
-		int rodInInventory = searchFishingRod(9, 36);
-		if(rodInInventory == -1)
+		if(bestRodSlot == -1)
 		{
 			ChatUtils.message("Out of fishing rods.");
 			setEnabled(false);
 			return;
 		}
 		
-		// find empty hotbar slot
-		int hotbarSlot = -1;
-		for(int i = 0; i < 9; i++)
+		if(bestRodSlot < 9)
 		{
-			// skip non-empty slots
-			if(!WItem.isNullOrEmpty(inventory.getStackInSlot(i)))
-				continue;
-			
-			hotbarSlot = i;
-			break;
+			inventory.currentItem = bestRodSlot;
+			return;
 		}
 		
-		// place rod in hotbar slot
-		PlayerControllerUtils.windowClick_PICKUP(rodInInventory);
-		if(hotbarSlot != -1)
-			PlayerControllerUtils.windowClick_PICKUP(36 + hotbarSlot);
-		else
+		// place rod in hotbar
+		int firstEmptySlot = inventory.getFirstEmptyStack();
+		if(firstEmptySlot != -1)
 		{
+			if(firstEmptySlot >= 9)
+				PlayerControllerUtils
+					.windowClick_QUICK_MOVE(36 + inventory.currentItem);
+			
+			PlayerControllerUtils.windowClick_QUICK_MOVE(bestRodSlot);
+			
+		}else
+		{
+			PlayerControllerUtils.windowClick_PICKUP(bestRodSlot);
 			PlayerControllerUtils
 				.windowClick_PICKUP(36 + inventory.currentItem);
-			PlayerControllerUtils.windowClick_PICKUP(rodInInventory);
+			timer = -bestRodSlot;
 		}
 	}
 	
@@ -128,21 +148,24 @@ public final class AutoFishHack extends Hack
 		rightClick();
 	}
 	
-	private int searchFishingRod(int from, int to)
+	private int getRodValue(ItemStack stack)
 	{
-		InventoryPlayer inventory = WMinecraft.getPlayer().inventory;
+		if(WItem.isNullOrEmpty(stack)
+			|| !(stack.getItem() instanceof ItemFishingRod))
+			return -1;
 		
-		for(int i = from; i < to; i++)
-		{
-			ItemStack stack = inventory.getStackInSlot(i);
-			if(WItem.isNullOrEmpty(stack))
-				continue;
-			
-			if(stack.getItem() instanceof ItemFishingRod)
-				return i;
-		}
+		int luckOTSLvl = EnchantmentHelper
+			.getEnchantmentLevel(Enchantments.LUCK_OF_THE_SEA, stack);
+		int lureLvl =
+			EnchantmentHelper.getEnchantmentLevel(Enchantments.LURE, stack);
+		int unbreakingLvl = EnchantmentHelper
+			.getEnchantmentLevel(Enchantments.UNBREAKING, stack);
+		int mendingBonus =
+			EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack);
+		int noVanishBonus = WEnchantments.hasVanishingCurse(stack) ? 0 : 1;
 		
-		return -1;
+		return luckOTSLvl * 9 + lureLvl * 9 + unbreakingLvl * 2 + mendingBonus
+			+ noVanishBonus;
 	}
 	
 	private void rightClick()
