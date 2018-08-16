@@ -35,6 +35,7 @@ import net.minecraft.network.play.server.SPacketBlockChange;
 import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.network.play.server.SPacketMultiBlockChange;
 import net.minecraft.network.play.server.SPacketMultiBlockChange.BlockUpdateData;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.chunk.Chunk;
@@ -273,9 +274,10 @@ public final class MobSpawnEspHack extends Hack
 			
 			WorldClient world = WMinecraft.getWorld();
 			List<BlockPos> blocks = stream.filter(pos -> {
-				return !BlockUtils.getState(pos).isBlockNormalCube()
+				return !BlockUtils.getMaterial(pos).blocksMovement()
 					&& !(BlockUtils.getBlock(pos) instanceof BlockLiquid)
-					&& BlockUtils.getState(pos.down()).isBlockNormalCube();
+					&& BlockUtils.getState(pos.down()).isSideSolid(world,
+						pos.down(), EnumFacing.UP);
 			}).collect(Collectors.toList());
 			
 			if(Thread.interrupted())
