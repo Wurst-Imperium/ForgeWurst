@@ -50,6 +50,8 @@ public final class HackList extends WHackList
 	public final JesusHack jesusHack = register(new JesusHack());
 	public final KillauraHack killauraHack = register(new KillauraHack());
 	public final MobEspHack mobEspHack = register(new MobEspHack());
+	public final MobSpawnEspHack mobSpawnEspHack =
+		register(new MobSpawnEspHack());
 	public final NoFallHack noFallHack = register(new NoFallHack());
 	public final NoHurtcamHack noHurtcamHack = register(new NoHurtcamHack());
 	public final NoWebHack noWebHack = register(new NoWebHack());
