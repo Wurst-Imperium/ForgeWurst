@@ -30,13 +30,14 @@ import net.wurstclient.forge.compatibility.WMinecraft;
 import net.wurstclient.forge.compatibility.WPlayer;
 import net.wurstclient.forge.compatibility.WVec3d;
 import net.wurstclient.forge.settings.CheckboxSetting;
+import net.wurstclient.forge.settings.EnumSetting;
 import net.wurstclient.forge.utils.RenderUtils;
 import net.wurstclient.forge.utils.RotationUtils;
 
 public final class MobEspHack extends Hack
 {
-	private final CheckboxSetting tracers =
-		new CheckboxSetting("Tracers", "Draws lines to mobs.", false);
+	private final EnumSetting<Style> style =
+		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
 		"Filter invisible", "Won't show invisible mobs.", false);
 	
@@ -47,7 +48,7 @@ public final class MobEspHack extends Hack
 	{
 		super("MobESP", "Highlights nearby mobs.");
 		setCategory(Category.RENDER);
-		addSetting(tracers);
+		addSetting(style);
 		addSetting(filterInvisible);
 	}
 	
@@ -94,7 +95,7 @@ public final class MobEspHack extends Hack
 	public void onCameraTransformViewBobbing(
 		WCameraTransformViewBobbingEvent event)
 	{
-		if(tracers.isChecked())
+		if(style.getSelected().lines)
 			event.setCanceled(true);
 	}
 	
@@ -116,9 +117,10 @@ public final class MobEspHack extends Hack
 		
 		double partialTicks = event.getPartialTicks();
 		
-		renderBoxes(partialTicks);
+		if(style.getSelected().boxes)
+			renderBoxes(partialTicks);
 		
-		if(tracers.isChecked())
+		if(style.getSelected().lines)
 			renderTracers(partialTicks);
 		
 		GL11.glPopMatrix();
@@ -175,5 +177,29 @@ public final class MobEspHack extends Hack
 				WVec3d.getZ(end));
 		}
 		GL11.glEnd();
+	}
+	
+	private enum Style
+	{
+		BOXES("Boxes only", true, false),
+		LINES("Lines only", false, true),
+		LINES_AND_BOXES("Lines and boxes", true, true);
+		
+		private final String name;
+		private final boolean boxes;
+		private final boolean lines;
+		
+		private Style(String name, boolean boxes, boolean lines)
+		{
+			this.name = name;
+			this.boxes = boxes;
+			this.lines = lines;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }
