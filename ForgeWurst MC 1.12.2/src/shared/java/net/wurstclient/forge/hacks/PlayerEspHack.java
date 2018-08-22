@@ -31,14 +31,15 @@ import net.wurstclient.forge.compatibility.WMinecraft;
 import net.wurstclient.forge.compatibility.WPlayer;
 import net.wurstclient.forge.compatibility.WVec3d;
 import net.wurstclient.forge.settings.CheckboxSetting;
+import net.wurstclient.forge.settings.EnumSetting;
 import net.wurstclient.forge.utils.EntityFakePlayer;
 import net.wurstclient.forge.utils.RenderUtils;
 import net.wurstclient.forge.utils.RotationUtils;
 
 public final class PlayerEspHack extends Hack
 {
-	private final CheckboxSetting tracers =
-		new CheckboxSetting("Tracers", "Draws lines to players.", true);
+	private final EnumSetting<Style> style =
+		new EnumSetting<>("Style", Style.values(), Style.BOXES);
 	private final CheckboxSetting filterSleeping = new CheckboxSetting(
 		"Filter sleeping", "Won't show sleeping players.", false);
 	private final CheckboxSetting filterInvisible = new CheckboxSetting(
@@ -51,7 +52,7 @@ public final class PlayerEspHack extends Hack
 	{
 		super("PlayerESP", "Highlights nearby players.");
 		setCategory(Category.RENDER);
-		addSetting(tracers);
+		addSetting(style);
 		addSetting(filterSleeping);
 		addSetting(filterInvisible);
 	}
@@ -105,7 +106,7 @@ public final class PlayerEspHack extends Hack
 	public void onCameraTransformViewBobbing(
 		WCameraTransformViewBobbingEvent event)
 	{
-		if(tracers.isChecked())
+		if(style.getSelected().lines)
 			event.setCanceled(true);
 	}
 	
@@ -127,10 +128,11 @@ public final class PlayerEspHack extends Hack
 		
 		double partialTicks = event.getPartialTicks();
 		
-		renderBoxes(partialTicks);
+		if(style.getSelected().boxes)
+			renderBoxes(partialTicks);
 		
-		if(tracers.isChecked())
-			renderTracers(partialTicks);
+		if(style.getSelected().lines)
+			renderLines(partialTicks);
 		
 		GL11.glPopMatrix();
 		
@@ -161,7 +163,7 @@ public final class PlayerEspHack extends Hack
 		}
 	}
 	
-	private void renderTracers(double partialTicks)
+	private void renderLines(double partialTicks)
 	{
 		Vec3d start = RotationUtils.getClientLookVec()
 			.addVector(0, WMinecraft.getPlayer().getEyeHeight(), 0)
@@ -186,5 +188,29 @@ public final class PlayerEspHack extends Hack
 				WVec3d.getZ(end));
 		}
 		GL11.glEnd();
+	}
+	
+	private enum Style
+	{
+		BOXES("Boxes only", true, false),
+		LINES("Lines only", false, true),
+		LINES_AND_BOXES("Lines and boxes", true, true);
+		
+		private final String name;
+		private final boolean boxes;
+		private final boolean lines;
+		
+		private Style(String name, boolean boxes, boolean lines)
+		{
+			this.name = name;
+			this.boxes = boxes;
+			this.lines = lines;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }
