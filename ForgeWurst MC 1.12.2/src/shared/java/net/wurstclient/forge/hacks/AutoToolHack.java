@@ -10,6 +10,7 @@ package net.wurstclient.forge.hacks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
@@ -33,6 +34,8 @@ public final class AutoToolHack extends Hack
 			"Use hands", "Uses an empty hand or a\n"
 				+ "non-damageable item when\n" + "no applicable tool is found.",
 			true);
+	private final CheckboxSetting repairMode = new CheckboxSetting(
+		"Repair mode", "Won't use tools that are about to break.", false);
 	
 	public AutoToolHack()
 	{
@@ -43,6 +46,7 @@ public final class AutoToolHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(useSwords);
 		addSetting(useHands);
+		addSetting(repairMode);
 	}
 	
 	@Override
@@ -61,10 +65,11 @@ public final class AutoToolHack extends Hack
 	public void onPlayerDamageBlock(WPlayerDamageBlockEvent event)
 	{
 		equipBestTool(event.getPos(), useSwords.isChecked(),
-			useHands.isChecked());
+			useHands.isChecked(), repairMode.isChecked());
 	}
 	
-	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands)
+	public void equipBestTool(BlockPos pos, boolean useSwords, boolean useHands,
+		boolean repairMode)
 	{
 		EntityPlayer player = WMinecraft.getPlayer();
 		if(player.capabilities.isCreativeMode)
@@ -76,15 +81,15 @@ public final class AutoToolHack extends Hack
 		float bestSpeed = getDestroySpeed(heldItem, state);
 		int bestSlot = -1;
 		
-		boolean useFallback = useHands && isDamageable(heldItem);
 		int fallbackSlot = -1;
+		InventoryPlayer inventory = player.inventory;
 		
 		for(int slot = 0; slot < 9; slot++)
 		{
-			if(slot == player.inventory.currentItem)
+			if(slot == inventory.currentItem)
 				continue;
 			
-			ItemStack stack = player.inventory.getStackInSlot(slot);
+			ItemStack stack = inventory.getStackInSlot(slot);
 			
 			if(fallbackSlot == -1 && !isDamageable(stack))
 				fallbackSlot = slot;
@@ -96,14 +101,37 @@ public final class AutoToolHack extends Hack
 			if(!useSwords && stack.getItem() instanceof ItemSword)
 				continue;
 			
+			if(isTooDamaged(stack, repairMode))
+				continue;
+			
 			bestSpeed = speed;
 			bestSlot = slot;
 		}
 		
+		boolean useFallback =
+			isDamageable(heldItem) && (isTooDamaged(heldItem, repairMode)
+				|| useHands && getDestroySpeed(heldItem, state) <= 1);
+		
 		if(bestSlot != -1)
-			player.inventory.currentItem = bestSlot;
-		else if(useFallback && bestSpeed <= 1 && fallbackSlot != -1)
-			player.inventory.currentItem = fallbackSlot;
+		{
+			inventory.currentItem = bestSlot;
+			return;
+		}
+		
+		if(!useFallback)
+			return;
+		
+		if(fallbackSlot != -1)
+		{
+			inventory.currentItem = fallbackSlot;
+			return;
+		}
+		
+		if(isTooDamaged(heldItem, repairMode))
+			if(inventory.currentItem == 8)
+				inventory.currentItem = 0;
+			else
+				inventory.currentItem++;
 	}
 	
 	private float getDestroySpeed(ItemStack stack, IBlockState state)
@@ -124,5 +152,10 @@ public final class AutoToolHack extends Hack
 	private boolean isDamageable(ItemStack stack)
 	{
 		return !WItem.isNullOrEmpty(stack) && stack.getItem().isDamageable();
+	}
+	
+	private boolean isTooDamaged(ItemStack stack, boolean repairMode)
+	{
+		return repairMode && stack.getMaxDamage() - stack.getItemDamage() <= 4;
 	}
 }

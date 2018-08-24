@@ -340,8 +340,8 @@ public final class TunnellerHack extends Hack
 				return;
 			}
 			
-			wurst.getHax().autoToolHack.equipBestTool(currentBlock, false,
-				true);
+			wurst.getHax().autoToolHack.equipBestTool(currentBlock, false, true,
+				false);
 			BlockUtils.breakBlockSimple(currentBlock);
 			
 			if(WMinecraft.getPlayer().capabilities.isCreativeMode
@@ -454,7 +454,8 @@ public final class TunnellerHack extends Hack
 				BlockUtils.placeBlockSimple(pos);
 			else
 			{
-				wurst.getHax().autoToolHack.equipBestTool(pos, false, true);
+				wurst.getHax().autoToolHack.equipBestTool(pos, false, true,
+					false);
 				BlockUtils.breakBlockSimple(pos);
 			}
 		}
