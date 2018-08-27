@@ -14,6 +14,8 @@ import java.util.HashSet;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockLiquid;
@@ -36,7 +38,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.wurstclient.fmlevents.WUpdateEvent;
 import net.wurstclient.forge.Category;
 import net.wurstclient.forge.Hack;
-import net.wurstclient.forge.Hack.DontSaveState;
 import net.wurstclient.forge.HackList;
 import net.wurstclient.forge.compatibility.WItem;
 import net.wurstclient.forge.compatibility.WMinecraft;
@@ -50,7 +51,7 @@ import net.wurstclient.forge.utils.PlayerControllerUtils;
 import net.wurstclient.forge.utils.RenderUtils;
 import net.wurstclient.forge.utils.RotationUtils;
 
-@DontSaveState
+@Hack.DontSaveState
 public final class TunnellerHack extends Hack
 {
 	private final EnumSetting<TunnelSize> size = new EnumSetting<>(
@@ -81,11 +82,13 @@ public final class TunnellerHack extends Hack
 	
 	public TunnellerHack()
 	{
-		super("Tunneller", "Automatically digs a tunnel.\n\n"
-			+ "\u00a7c\u00a7lWARNING:\u00a7r Although this bot will try to avoid\n"
-			+ "lava and other dangers, there is no guarantee\n"
-			+ "that it won't die. Only send it out with gear\n"
-			+ "that you don't mind losing.");
+		super("Tunneller",
+			"Automatically digs a tunnel.\n\n" + ChatFormatting.RED
+				+ ChatFormatting.BOLD + "WARNING:" + ChatFormatting.RESET
+				+ " Although this bot will try to avoid\n"
+				+ "lava and other dangers, there is no guarantee\n"
+				+ "that it won't die. Only send it out with gear\n"
+				+ "that you don't mind losing.");
 		setCategory(Category.BLOCKS);
 		addSetting(size);
 		addSetting(limit);
