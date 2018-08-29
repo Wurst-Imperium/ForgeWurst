@@ -41,9 +41,19 @@ public final class SetCheckboxCmd extends Command
 				+ " is not a checkbox.");
 		CheckboxSetting e = (CheckboxSetting)setting;
 		
-		if(!args[2].equalsIgnoreCase("true")
-			&& !args[2].equalsIgnoreCase("false"))
-			throw new CmdSyntaxError("Not a boolean: " + args[2]);
+		if(args[2].equalsIgnoreCase("toggle"))
+		{
+			if(e.isChecked())
+				args[2] = "false";
+			else
+				args[2] = "true";
+		}
+		else
+		{
+			if(!args[2].equalsIgnoreCase("true")
+					&& !args[2].equalsIgnoreCase("false"))
+				throw new CmdSyntaxError("Not a boolean: " + args[2]);
+		}
 		
 		e.setChecked(Boolean.parseBoolean(args[2]));
 	}
