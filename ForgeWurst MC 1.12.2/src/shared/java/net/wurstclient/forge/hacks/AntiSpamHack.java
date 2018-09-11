@@ -50,11 +50,11 @@ public final class AntiSpamHack extends Hack
 			return;
 		
 		GuiNewChat chat = mc.ingameGUI.getChatGUI();
-		int maxTextLenght =
+		int maxTextLength =
 			MathUtils.floor(chat.getChatWidth() / chat.getChatScale());
 		List<ITextComponent> newLines =
 			GuiUtilRenderComponents.splitText(event.getComponent(),
-				maxTextLenght, WMinecraft.getFontRenderer(), false, false);
+				maxTextLength, WMinecraft.getFontRenderer(), false, false);
 		
 		int spamCounter = 1;
 		int matchingLines = 0;
