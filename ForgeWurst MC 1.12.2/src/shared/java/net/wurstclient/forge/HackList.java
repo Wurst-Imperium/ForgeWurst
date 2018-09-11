@@ -28,6 +28,7 @@ import net.wurstclient.forge.utils.JsonUtils;
 
 public final class HackList extends WHackList
 {
+	public final AntiSpamHack antiSpamHack = register(new AntiSpamHack());
 	public final AutoArmorHack autoArmorHack = register(new AutoArmorHack());
 	public final AutoFarmHack autoFarmHack = register(new AutoFarmHack());
 	public final AutoFishHack autoFishHack = register(new AutoFishHack());

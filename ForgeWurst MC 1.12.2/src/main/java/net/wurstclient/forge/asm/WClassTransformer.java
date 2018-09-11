@@ -38,6 +38,8 @@ public final class WClassTransformer implements IClassTransformer
 			GuiContainerCreativeVisitor.class);
 		visitors.put("net.minecraft.client.gui.inventory.GuiInventory",
 			GuiInventoryVisitor.class);
+		visitors.put("net.minecraft.client.gui.GuiNewChat",
+			GuiNewChatVisitor.class);
 		visitors.put("net.minecraft.client.network.NetHandlerPlayClient",
 			NetHandlerPlayClientVisitor.class);
 		visitors.put("net.minecraft.network.NetworkManager",

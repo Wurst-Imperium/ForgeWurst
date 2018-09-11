@@ -52,6 +52,11 @@ public final class WEventFactory
 		return MinecraftForge.EVENT_BUS.post(event) ? "" : event.getMessage();
 	}
 	
+	public static boolean onClientReceivedMessage(WChatInputEvent event)
+	{
+		return !MinecraftForge.EVENT_BUS.post(event);
+	}
+	
 	public static Packet onSendPacket(Packet<?> packet)
 	{
 		WPacketOutputEvent event = new WPacketOutputEvent(packet);
