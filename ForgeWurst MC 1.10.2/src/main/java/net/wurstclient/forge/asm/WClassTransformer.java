@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRema
 
 public final class WClassTransformer implements IClassTransformer
 {
-	private final HashMap<String, Class<? extends ClassVisitor>> visitors =
+	private final HashMap<String, Class<? extends WurstClassVisitor>> visitors =
 		new HashMap<>();
 	
 	private final boolean obfuscated = !FMLDeobfuscatingRemapper.INSTANCE
