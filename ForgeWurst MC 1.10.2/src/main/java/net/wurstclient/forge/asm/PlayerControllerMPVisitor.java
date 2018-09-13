@@ -17,8 +17,8 @@ public final class PlayerControllerMPVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
-		String enumFacing = obf ? "ct" : "net/minecraft/util/EnumFacing";
+		String blockPos = unmap("net/minecraft/util/math/BlockPos");
+		String enumFacing = unmap("net/minecraft/util/EnumFacing");
 		
 		String onPlayerDamageBlock_name = obf ? "b" : "onPlayerDamageBlock";
 		String onPlayerDamageBlock_desc =

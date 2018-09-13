@@ -18,7 +18,7 @@ public final class TileEntityRendererDispatcherVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String tileEntity = obf ? "aqk" : "net/minecraft/tileentity/TileEntity";
+		String tileEntity = unmap("net/minecraft/tileentity/TileEntity");
 		
 		String render_name = obf ? "a" : "renderTileEntity";
 		String render_desc = "(L" + tileEntity + ";FI)V";

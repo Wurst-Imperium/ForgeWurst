@@ -18,7 +18,7 @@ public final class NetHandlerPlayClientVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String packet = obf ? "ht" : "net/minecraft/network/Packet";
+		String packet = unmap("net/minecraft/network/Packet");
 		
 		String sendPacket_name = obf ? "a" : "sendPacket";
 		String sendPacket_desc = "(L" + packet + ";)V";

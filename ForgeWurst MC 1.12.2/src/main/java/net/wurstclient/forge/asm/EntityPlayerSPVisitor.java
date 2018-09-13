@@ -17,7 +17,7 @@ public final class EntityPlayerSPVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String moverType = obf ? "vv" : "net/minecraft/entity/MoverType";
+		String moverType = unmap("net/minecraft/entity/MoverType");
 		
 		String onUpdateWalkingPlayer_name = obf ? "N" : "onUpdateWalkingPlayer";
 		String onUpdateWalkingPlayer_desc = "()V";

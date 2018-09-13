@@ -18,7 +18,7 @@ public final class NetworkManagerVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String packet = obf ? "ht" : "net/minecraft/network/Packet";
+		String packet = unmap("net/minecraft/network/Packet");
 		
 		String channelRead0_name = obf ? "a" : "channelRead0";
 		String channelRead0_desc =

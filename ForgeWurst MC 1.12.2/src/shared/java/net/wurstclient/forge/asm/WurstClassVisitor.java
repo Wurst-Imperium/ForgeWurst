@@ -13,6 +13,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+
 public abstract class WurstClassVisitor extends ClassVisitor
 {
 	private final ArrayList<MethodVisitorRegistryEntry> methodVisitorRegistry =
@@ -35,6 +37,11 @@ public abstract class WurstClassVisitor extends ClassVisitor
 				return entry.factory.createMethodVisitor(mv);
 			
 		return mv;
+	}
+	
+	protected String unmap(String typeName)
+	{
+		return FMLDeobfuscatingRemapper.INSTANCE.unmap(typeName);
 	}
 	
 	protected void registerMethodVisitor(String name, String desc,

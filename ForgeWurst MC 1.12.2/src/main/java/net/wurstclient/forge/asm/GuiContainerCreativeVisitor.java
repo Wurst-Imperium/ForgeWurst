@@ -19,7 +19,7 @@ public final class GuiContainerCreativeVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String guiButton = obf ? "bja" : "net/minecraft/client/gui/GuiButton";
+		String guiButton = unmap("net/minecraft/client/gui/GuiButton");
 		
 		String initGui_name = obf ? "b" : "initGui";
 		String initGui_desc = "()V";

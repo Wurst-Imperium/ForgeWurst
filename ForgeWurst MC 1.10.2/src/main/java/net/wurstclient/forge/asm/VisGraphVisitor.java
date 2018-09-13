@@ -18,7 +18,7 @@ public final class VisGraphVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
+		String blockPos = unmap("net/minecraft/util/math/BlockPos");
 		
 		String setOpaqueCube_name = obf ? "a" : "setOpaqueCube";
 		String setOpaqueCube_desc = "(L" + blockPos + ";)V";

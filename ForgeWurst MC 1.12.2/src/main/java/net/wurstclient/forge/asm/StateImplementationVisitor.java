@@ -18,9 +18,9 @@ public final class StateImplementationVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String iBlockAccess = obf ? "amy" : "net/minecraft/world/IBlockAccess";
-		String blockPos = obf ? "et" : "net/minecraft/util/math/BlockPos";
-		String enumFacing = obf ? "fa" : "net/minecraft/util/EnumFacing";
+		String iBlockAccess = unmap("net/minecraft/world/IBlockAccess");
+		String blockPos = unmap("net/minecraft/util/math/BlockPos");
+		String enumFacing = unmap("net/minecraft/util/EnumFacing");
 		
 		String getAmbientOcclusionLightValue_name =
 			obf ? "j" : "getAmbientOcclusionLightValue";

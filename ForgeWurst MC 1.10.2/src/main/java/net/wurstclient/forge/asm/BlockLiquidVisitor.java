@@ -23,11 +23,10 @@ public final class BlockLiquidVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String iBlockState =
-			obf ? "ars" : "net/minecraft/block/state/IBlockState";
-		String world = obf ? "aid" : "net/minecraft/world/World";
-		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
-		axisAlignedBB = obf ? "bby" : "net/minecraft/util/math/AxisAlignedBB";
+		String iBlockState = unmap("net/minecraft/block/state/IBlockState");
+		String world = unmap("net/minecraft/world/World");
+		String blockPos = unmap("net/minecraft/util/math/BlockPos");
+		axisAlignedBB = unmap("net/minecraft/util/math/AxisAlignedBB");
 		
 		String getCollisionBoundingBox_name =
 			obf ? "a" : "getCollisionBoundingBox";

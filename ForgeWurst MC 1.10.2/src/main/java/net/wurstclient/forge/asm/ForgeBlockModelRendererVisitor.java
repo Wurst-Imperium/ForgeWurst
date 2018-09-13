@@ -18,28 +18,23 @@ public final class ForgeBlockModelRendererVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		// WClassTransformer cannot detect whether or not this class is
-		// obfuscated because its name does not change
+		String iBlockAccess = unmap("net/minecraft/world/IBlockAccess");
+		String iBakedModel =
+			unmap("net/minecraft/client/renderer/block/model/IBakedModel");
+		String iBlockState = unmap("net/minecraft/block/state/IBlockState");
+		String blockPos = unmap("net/minecraft/util/math/BlockPos");
+		String vertexBuffer =
+			unmap("net/minecraft/client/renderer/VertexBuffer");
 		
-		String renderModelFlat_name = "renderModelFlat";
-		String renderModelFlat_obfname = "c";
-		String renderModelSmooth_name = "renderModelSmooth";
-		String renderModelSmooth_obfname = "b";
-		String renderModel_desc = "(Lnet/minecraft/world/IBlockAccess;"
-			+ "Lnet/minecraft/client/renderer/block/model/IBakedModel;"
-			+ "Lnet/minecraft/block/state/IBlockState;"
-			+ "Lnet/minecraft/util/math/BlockPos;"
-			+ "Lnet/minecraft/client/renderer/VertexBuffer;ZJ)Z";
-		String renderModel_obfdesc = "(Laih;Lbyl;Lars;Lcm;Lbnt;ZJ)Z";
+		String renderModelFlat_name = obf ? "c" : "renderModelFlat";
+		String renderModelSmooth_name = obf ? "b" : "renderModelSmooth";
+		String renderModel_desc = "(L" + iBlockAccess + ";" + "L" + iBakedModel
+			+ ";" + "L" + iBlockState + ";" + "L" + blockPos + ";" + "L"
+			+ vertexBuffer + ";ZJ)Z";
 		
 		registerMethodVisitor(renderModelFlat_name, renderModel_desc,
 			mv -> new RenderModelFlatVisitor(mv));
-		registerMethodVisitor(renderModelFlat_obfname, renderModel_obfdesc,
-			mv -> new RenderModelFlatVisitor(mv));
-		
 		registerMethodVisitor(renderModelSmooth_name, renderModel_desc,
-			mv -> new RenderModelSmoothVisitor(mv));
-		registerMethodVisitor(renderModelSmooth_obfname, renderModel_obfdesc,
 			mv -> new RenderModelSmoothVisitor(mv));
 	}
 	

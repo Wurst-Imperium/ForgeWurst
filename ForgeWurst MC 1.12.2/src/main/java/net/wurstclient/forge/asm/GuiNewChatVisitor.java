@@ -20,8 +20,7 @@ public final class GuiNewChatVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String iTextComponent =
-			obf ? "hh" : "net/minecraft/util/text/ITextComponent";
+		String iTextComponent = unmap("net/minecraft/util/text/ITextComponent");
 		
 		String printChatMessageWithOptionalDeletion_name =
 			obf ? "a" : "printChatMessageWithOptionalDeletion";

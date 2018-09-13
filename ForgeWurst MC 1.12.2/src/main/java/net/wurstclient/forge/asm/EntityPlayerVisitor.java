@@ -17,6 +17,7 @@ public final class EntityPlayerVisitor extends WurstClassVisitor
 	public EntityPlayerVisitor(ClassVisitor cv, boolean obf)
 	{
 		super(cv);
+		
 		String jump_name = obf ? "cu" : "jump";
 		String jump_desc = "()V";
 		
