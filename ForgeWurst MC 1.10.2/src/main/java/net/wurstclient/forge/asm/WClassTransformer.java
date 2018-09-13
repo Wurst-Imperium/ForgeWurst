@@ -14,11 +14,16 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 public final class WClassTransformer implements IClassTransformer
 {
 	private final HashMap<String, Class<? extends ClassVisitor>> visitors =
 		new HashMap<>();
+	
+	private final boolean obfuscated = !FMLDeobfuscatingRemapper.INSTANCE
+		.unmap("net/minecraft/client/Minecraft")
+		.equals("net/minecraft/client/Minecraft");
 	
 	public WClassTransformer()
 	{
@@ -64,7 +69,6 @@ public final class WClassTransformer implements IClassTransformer
 		if(!visitors.containsKey(transformedName))
 			return basicClass;
 		
-		boolean obfuscated = !name.equals(transformedName);
 		System.out.println(
 			"Transforming " + transformedName + ", obfuscated=" + obfuscated);
 		
