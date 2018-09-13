@@ -14,11 +14,14 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import net.wurstclient.forge.compatibility.WMinecraft;
+import net.wurstclient.forge.update.Version;
 
 public abstract class WurstClassVisitor extends ClassVisitor
 {
 	private final ArrayList<MethodVisitorRegistryEntry> methodVisitorRegistry =
 		new ArrayList<>();
+	protected final Version mcVersion = new Version(WMinecraft.VERSION);
 	
 	public WurstClassVisitor(ClassVisitor cv)
 	{
