@@ -12,40 +12,29 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class NetworkManagerVisitor extends ClassVisitor
+public final class NetworkManagerVisitor extends WurstClassVisitor
 {
-	private String channelRead0_name;
-	private String channelRead0_desc;
-	
-	public NetworkManagerVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public NetworkManagerVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		channelRead0_name = obfuscated ? "a" : "channelRead0";
-		channelRead0_desc = obfuscated
-			? "(Lio/netty/channel/ChannelHandlerContext;Lht;)V"
-			: "(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/Packet;)V";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(channelRead0_name) && desc.equals(channelRead0_desc))
-			return new ChannelRead0Visitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String packet = obf ? "ht" : "net/minecraft/network/Packet";
+		
+		String channelRead0_name = obf ? "a" : "channelRead0";
+		String channelRead0_desc =
+			"(Lio/netty/channel/ChannelHandlerContext;L" + packet + ";)V";
+		
+		registerMethodVisitor(channelRead0_name, channelRead0_desc,
+			mv -> new ChannelRead0Visitor(mv));
 	}
 	
 	private static class ChannelRead0Visitor extends MethodVisitor
 	{
 		private boolean done;
 		
-		public ChannelRead0Visitor(int api, MethodVisitor mv)
+		public ChannelRead0Visitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -58,6 +47,7 @@ public final class NetworkManagerVisitor extends ClassVisitor
 			
 			System.out.println(
 				"NetworkManagerVisitor.ChannelRead0Visitor.visitJumpInsn()");
+			
 			mv.visitVarInsn(Opcodes.ALOAD, 2);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				"net/wurstclient/forge/compatibility/WEventFactory",
@@ -67,6 +57,7 @@ public final class NetworkManagerVisitor extends ClassVisitor
 			mv.visitInsn(Opcodes.RETURN);
 			mv.visitLabel(l1);
 			mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+			
 			done = true;
 		}
 	}

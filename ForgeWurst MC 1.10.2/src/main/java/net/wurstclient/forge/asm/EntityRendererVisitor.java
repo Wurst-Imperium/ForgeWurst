@@ -12,47 +12,33 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class EntityRendererVisitor extends ClassVisitor
+public final class EntityRendererVisitor extends WurstClassVisitor
 {
-	private String hurtCameraEffect_name;
-	private String hurtCameraEffect_desc;
-	
-	private String setupCameraTransform_name;
-	private String setupCameraTransform_desc;
 	private String viewBobbingField;
 	
-	public EntityRendererVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public EntityRendererVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		hurtCameraEffect_name = obfuscated ? "d" : "hurtCameraEffect";
-		hurtCameraEffect_desc = "(F)V";
-		setupCameraTransform_name = obfuscated ? "a" : "setupCameraTransform";
-		setupCameraTransform_desc = "(FI)V";
-		viewBobbingField = obfuscated ? "e" : "viewBobbing";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(hurtCameraEffect_name)
-			&& desc.equals(hurtCameraEffect_desc))
-			return new HurtCameraEffectVisitor(Opcodes.ASM4, mv);
-		else if(name.equals(setupCameraTransform_name)
-			&& desc.equals(setupCameraTransform_desc))
-			return new SetupCameraTransformVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String hurtCameraEffect_name = obf ? "d" : "hurtCameraEffect";
+		String hurtCameraEffect_desc = "(F)V";
+		String setupCameraTransform_name = obf ? "a" : "setupCameraTransform";
+		String setupCameraTransform_desc = "(FI)V";
+		
+		viewBobbingField = obf ? "e" : "viewBobbing";
+		
+		registerMethodVisitor(hurtCameraEffect_name, hurtCameraEffect_desc,
+			mv -> new HurtCameraEffectVisitor(mv));
+		registerMethodVisitor(setupCameraTransform_name,
+			setupCameraTransform_desc,
+			mv -> new SetupCameraTransformVisitor(mv));
 	}
 	
 	private static class HurtCameraEffectVisitor extends MethodVisitor
 	{
-		public HurtCameraEffectVisitor(int api, MethodVisitor mv)
+		public HurtCameraEffectVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -60,6 +46,7 @@ public final class EntityRendererVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"EntityRendererVisitor.HurtCameraEffectVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				"net/wurstclient/forge/compatibility/WEventFactory",
@@ -76,9 +63,9 @@ public final class EntityRendererVisitor extends ClassVisitor
 	{
 		private boolean foundViewBobbing;
 		
-		public SetupCameraTransformVisitor(int api, MethodVisitor mv)
+		public SetupCameraTransformVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -102,6 +89,7 @@ public final class EntityRendererVisitor extends ClassVisitor
 			
 			System.out.println(
 				"EntityRendererVisitor.SetupCameraTransformVisitor.visitJumpInsn()");
+			
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				"net/wurstclient/forge/compatibility/WEventFactory",
 				"cameraTransformViewBobbing", "()Z", false);

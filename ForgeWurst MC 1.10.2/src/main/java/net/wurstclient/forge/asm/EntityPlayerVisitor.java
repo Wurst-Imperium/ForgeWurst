@@ -12,42 +12,30 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class EntityPlayerVisitor extends ClassVisitor
+public final class EntityPlayerVisitor extends WurstClassVisitor
 {
-	private String jump_name;
-	private String jump_desc;
-	
-	public EntityPlayerVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public EntityPlayerVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		jump_name = obfuscated ? "cl" : "jump";
-		jump_desc = "()V";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(jump_name) && desc.equals(jump_desc))
-			return new JumpVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String jump_name = obf ? "cl" : "jump";
+		String jump_desc = "()V";
+		
+		registerMethodVisitor(jump_name, jump_desc, mv -> new JumpVisitor(mv));
 	}
 	
 	private static class JumpVisitor extends MethodVisitor
 	{
-		public JumpVisitor(int api, MethodVisitor mv)
+		public JumpVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
 		public void visitCode()
 		{
 			System.out.println("EntityPlayerVisitor.JumpVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,

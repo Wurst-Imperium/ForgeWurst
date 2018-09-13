@@ -11,39 +11,28 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class PlayerControllerMPVisitor extends ClassVisitor
+public final class PlayerControllerMPVisitor extends WurstClassVisitor
 {
-	private String onPlayerDamageBlock_name;
-	private String onPlayerDamageBlock_desc;
-	
-	public PlayerControllerMPVisitor(int api, ClassVisitor cv,
-		boolean obfuscated)
+	public PlayerControllerMPVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		onPlayerDamageBlock_name = obfuscated ? "b" : "onPlayerDamageBlock";
-		onPlayerDamageBlock_desc = obfuscated ? "(Lcm;Lct;)Z"
-			: "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Z";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(onPlayerDamageBlock_name)
-			&& desc.equals(onPlayerDamageBlock_desc))
-			return new OnPlayerDamageBlockVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
+		String enumFacing = obf ? "ct" : "net/minecraft/util/EnumFacing";
+		
+		String onPlayerDamageBlock_name = obf ? "b" : "onPlayerDamageBlock";
+		String onPlayerDamageBlock_desc =
+			"(L" + blockPos + ";L" + enumFacing + ";)Z";
+		
+		registerMethodVisitor(onPlayerDamageBlock_name,
+			onPlayerDamageBlock_desc, mv -> new OnPlayerDamageBlockVisitor(mv));
 	}
 	
 	private static class OnPlayerDamageBlockVisitor extends MethodVisitor
 	{
-		public OnPlayerDamageBlockVisitor(int api, MethodVisitor mv)
+		public OnPlayerDamageBlockVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -51,6 +40,7 @@ public final class PlayerControllerMPVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"PlayerControllerMPVisitor.OnPlayerDamageBlockVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 1);
 			mv.visitVarInsn(Opcodes.ALOAD, 2);

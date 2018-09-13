@@ -11,47 +11,34 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class GuiContainerCreativeVisitor extends ClassVisitor
+public final class GuiContainerCreativeVisitor extends WurstClassVisitor
 {
-	private String initGui_name;
-	private String initGui_desc;
-	private String actionPerformed_name;
-	private String actionPerformed_desc;
 	private String buttonList_name;
 	
-	public GuiContainerCreativeVisitor(int api, ClassVisitor cv,
-		boolean obfuscated)
+	public GuiContainerCreativeVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		initGui_name = obfuscated ? "b" : "initGui";
-		initGui_desc = "()V";
-		actionPerformed_name = obfuscated ? "a" : "actionPerformed";
-		actionPerformed_desc =
-			obfuscated ? "(Lbdr;)V" : "(Lnet/minecraft/client/gui/GuiButton;)V";
-		buttonList_name = obfuscated ? "field_146292_n" : "buttonList";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(initGui_name) && desc.equals(initGui_desc))
-			return new InitGuiVisitor(Opcodes.ASM4, mv);
-		else if(name.equals(actionPerformed_name)
-			&& desc.equals(actionPerformed_desc))
-			return new ActionPerformedVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String guiButton = obf ? "bdr" : "net/minecraft/client/gui/GuiButton";
+		
+		String initGui_name = obf ? "b" : "initGui";
+		String initGui_desc = "()V";
+		String actionPerformed_name = obf ? "a" : "actionPerformed";
+		String actionPerformed_desc = "(L" + guiButton + ";)V";
+		
+		buttonList_name = obf ? "field_146292_n" : "buttonList";
+		
+		registerMethodVisitor(initGui_name, initGui_desc,
+			mv -> new InitGuiVisitor(mv));
+		registerMethodVisitor(actionPerformed_name, actionPerformed_desc,
+			mv -> new ActionPerformedVisitor(mv));
 	}
 	
 	private class InitGuiVisitor extends MethodVisitor
 	{
-		public InitGuiVisitor(int api, MethodVisitor mv)
+		public InitGuiVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -61,6 +48,7 @@ public final class GuiContainerCreativeVisitor extends ClassVisitor
 			{
 				System.out.println(
 					"GuiContainerCreativeVisitor.InitGuiVisitor.visitInsn()");
+				
 				mv.visitVarInsn(Opcodes.ALOAD, 0);
 				mv.visitFieldInsn(Opcodes.GETFIELD,
 					"net/minecraft/client/gui/inventory/GuiContainerCreative",
@@ -76,9 +64,9 @@ public final class GuiContainerCreativeVisitor extends ClassVisitor
 	
 	private static class ActionPerformedVisitor extends MethodVisitor
 	{
-		public ActionPerformedVisitor(int api, MethodVisitor mv)
+		public ActionPerformedVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -88,6 +76,7 @@ public final class GuiContainerCreativeVisitor extends ClassVisitor
 			{
 				System.out.println(
 					"GuiContainerCreativeVisitor.ActionPerformedVisitor.visitInsn()");
+				
 				mv.visitVarInsn(Opcodes.ALOAD, 1);
 				mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 					"net/wurstclient/forge/compatibility/WEventFactory",

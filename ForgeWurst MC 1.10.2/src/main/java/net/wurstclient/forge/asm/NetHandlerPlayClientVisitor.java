@@ -12,38 +12,26 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class NetHandlerPlayClientVisitor extends ClassVisitor
+public final class NetHandlerPlayClientVisitor extends WurstClassVisitor
 {
-	private String sendPacket_name;
-	private String sendPacket_desc;
-	
-	public NetHandlerPlayClientVisitor(int api, ClassVisitor cv,
-		boolean obfuscated)
+	public NetHandlerPlayClientVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		sendPacket_name = obfuscated ? "a" : "sendPacket";
-		sendPacket_desc =
-			obfuscated ? "(Lfj;)V" : "(Lnet/minecraft/network/Packet;)V";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(sendPacket_name) && desc.equals(sendPacket_desc))
-			return new SendPacketVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String packet = obf ? "fj" : "net/minecraft/network/Packet";
+		
+		String sendPacket_name = obf ? "a" : "sendPacket";
+		String sendPacket_desc = "(L" + packet + ";)V";
+		
+		registerMethodVisitor(sendPacket_name, sendPacket_desc,
+			mv -> new SendPacketVisitor(mv));
 	}
 	
 	private static class SendPacketVisitor extends MethodVisitor
 	{
-		public SendPacketVisitor(int api, MethodVisitor mv)
+		public SendPacketVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -51,6 +39,7 @@ public final class NetHandlerPlayClientVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"NetHandlerPlayClientVisitor.SendPacketVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 1);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,

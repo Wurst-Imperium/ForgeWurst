@@ -12,60 +12,43 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class StateImplementationVisitor extends ClassVisitor
+public final class StateImplementationVisitor extends WurstClassVisitor
 {
-	private String getAmbientOcclusionLightValue_name;
-	private String getAmbientOcclusionLightValue_desc;
-	
-	private String isNormalCube_name;
-	private String isNormalCube_desc;
-	
-	private String shouldSideBeRendered_name;
-	private String shouldSideBeRendered_desc;
-	
-	public StateImplementationVisitor(int api, ClassVisitor cv,
-		boolean obfuscated)
+	public StateImplementationVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
+		super(cv);
 		
-		getAmbientOcclusionLightValue_name =
-			obfuscated ? "j" : "getAmbientOcclusionLightValue";
-		getAmbientOcclusionLightValue_desc = "()F";
+		String iBlockAccess = obf ? "aih" : "net/minecraft/world/IBlockAccess";
+		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
+		String enumFacing = obf ? "ct" : "net/minecraft/util/EnumFacing";
 		
-		isNormalCube_name = obfuscated ? "l" : "isNormalCube";
-		isNormalCube_desc = "()Z";
+		String getAmbientOcclusionLightValue_name =
+			obf ? "j" : "getAmbientOcclusionLightValue";
+		String getAmbientOcclusionLightValue_desc = "()F";
 		
-		shouldSideBeRendered_name = obfuscated ? "c" : "shouldSideBeRendered";
-		shouldSideBeRendered_desc = obfuscated ? "(Laih;Lcm;Lct;)Z"
-			: "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Z";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		String isNormalCube_name = obf ? "l" : "isNormalCube";
+		String isNormalCube_desc = "()Z";
 		
-		if(name.equals(getAmbientOcclusionLightValue_name)
-			&& desc.equals(getAmbientOcclusionLightValue_desc))
-			return new GetAmbientOcclusionLightValueVisitor(Opcodes.ASM4, mv);
-		else if(name.equals(isNormalCube_name)
-			&& desc.equals(isNormalCube_desc))
-			return new IsNormalCubeVisitor(Opcodes.ASM4, mv);
-		else if(name.equals(shouldSideBeRendered_name)
-			&& desc.equals(shouldSideBeRendered_desc))
-			return new ShouldSideBeRenderedVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String shouldSideBeRendered_name = obf ? "c" : "shouldSideBeRendered";
+		String shouldSideBeRendered_desc =
+			"(L" + iBlockAccess + ";L" + blockPos + ";L" + enumFacing + ";)Z";
+		
+		registerMethodVisitor(getAmbientOcclusionLightValue_name,
+			getAmbientOcclusionLightValue_desc,
+			mv -> new GetAmbientOcclusionLightValueVisitor(mv));
+		registerMethodVisitor(isNormalCube_name, isNormalCube_desc,
+			mv -> new IsNormalCubeVisitor(mv));
+		registerMethodVisitor(shouldSideBeRendered_name,
+			shouldSideBeRendered_desc,
+			mv -> new ShouldSideBeRenderedVisitor(mv));
 	}
 	
 	private static class GetAmbientOcclusionLightValueVisitor
 		extends MethodVisitor
 	{
-		public GetAmbientOcclusionLightValueVisitor(int api, MethodVisitor mv)
+		public GetAmbientOcclusionLightValueVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -75,6 +58,7 @@ public final class StateImplementationVisitor extends ClassVisitor
 			{
 				System.out.println(
 					"StateImplementationVisitor.GetAmbientOcclusionLightValueVisitor.visitInsn()");
+				
 				mv.visitVarInsn(Opcodes.ALOAD, 0);
 				mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 					"net/wurstclient/forge/compatibility/WEventFactory",
@@ -88,9 +72,9 @@ public final class StateImplementationVisitor extends ClassVisitor
 	
 	private static class IsNormalCubeVisitor extends MethodVisitor
 	{
-		public IsNormalCubeVisitor(int api, MethodVisitor mv)
+		public IsNormalCubeVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -100,6 +84,7 @@ public final class StateImplementationVisitor extends ClassVisitor
 			{
 				System.out.println(
 					"StateImplementationVisitor.IsNormalCubeVisitor.visitInsn()");
+				
 				Label l1 = new Label();
 				mv.visitJumpInsn(Opcodes.IFEQ, l1);
 				mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -121,9 +106,9 @@ public final class StateImplementationVisitor extends ClassVisitor
 	
 	private static class ShouldSideBeRenderedVisitor extends MethodVisitor
 	{
-		public ShouldSideBeRenderedVisitor(int api, MethodVisitor mv)
+		public ShouldSideBeRenderedVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -133,6 +118,7 @@ public final class StateImplementationVisitor extends ClassVisitor
 			{
 				System.out.println(
 					"StateImplementationVisitor.ShouldSideBeRenderedVisitor.visitInsn()");
+				
 				mv.visitVarInsn(Opcodes.ALOAD, 0);
 				mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 					"net/wurstclient/forge/compatibility/WEventFactory",

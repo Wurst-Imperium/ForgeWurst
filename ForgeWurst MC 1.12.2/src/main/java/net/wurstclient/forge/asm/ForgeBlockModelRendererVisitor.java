@@ -12,53 +12,42 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class ForgeBlockModelRendererVisitor extends ClassVisitor
+public final class ForgeBlockModelRendererVisitor extends WurstClassVisitor
 {
-	private String renderModelFlat_name = "renderModelFlat";
-	private String renderModelFlat_obfname = "c";
-	private String renderModelSmooth_name = "renderModelSmooth";
-	private String renderModelSmooth_obfname = "b";
-	private String renderModel_desc =
-		"(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/client/renderer/block/model/IBakedModel;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/renderer/BufferBuilder;ZJ)Z";
-	private String renderModel_obfdesc = "(Lamy;Lcfy;Lawt;Let;Lbuk;ZJ)Z";
-	
-	public ForgeBlockModelRendererVisitor(int api, ClassVisitor cv,
-		boolean obfuscated)
+	public ForgeBlockModelRendererVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
+		super(cv);
 		
 		// WClassTransformer cannot detect whether or not this class is
 		// obfuscated because its name does not change
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
 		
-		if(desc.equals(renderModel_desc))
-		{
-			if(name.equals(renderModelFlat_name))
-				return new RenderModelFlatVisitor(Opcodes.ASM4, mv);
-			else if(name.equals(renderModelSmooth_name))
-				return new RenderModelSmoothVisitor(Opcodes.ASM4, mv);
-			
-		}else if(desc.equals(renderModel_obfdesc))
-			if(name.equals(renderModelFlat_obfname))
-				return new RenderModelFlatVisitor(Opcodes.ASM4, mv);
-			else if(name.equals(renderModelSmooth_obfname))
-				return new RenderModelSmoothVisitor(Opcodes.ASM4, mv);
-			
-		return mv;
+		String renderModelFlat_name = "renderModelFlat";
+		String renderModelFlat_obfname = "c";
+		String renderModelSmooth_name = "renderModelSmooth";
+		String renderModelSmooth_obfname = "b";
+		String renderModel_desc = "(Lnet/minecraft/world/IBlockAccess;"
+			+ "Lnet/minecraft/client/renderer/block/model/IBakedModel;"
+			+ "Lnet/minecraft/block/state/IBlockState;"
+			+ "Lnet/minecraft/util/math/BlockPos;"
+			+ "Lnet/minecraft/client/renderer/BufferBuilder;ZJ)Z";
+		String renderModel_obfdesc = "(Lamy;Lcfy;Lawt;Let;Lbuk;ZJ)Z";
+		
+		registerMethodVisitor(renderModelFlat_name, renderModel_desc,
+			mv -> new RenderModelFlatVisitor(mv));
+		registerMethodVisitor(renderModelFlat_obfname, renderModel_obfdesc,
+			mv -> new RenderModelFlatVisitor(mv));
+		
+		registerMethodVisitor(renderModelSmooth_name, renderModel_desc,
+			mv -> new RenderModelSmoothVisitor(mv));
+		registerMethodVisitor(renderModelSmooth_obfname, renderModel_obfdesc,
+			mv -> new RenderModelSmoothVisitor(mv));
 	}
 	
 	private static class RenderModelFlatVisitor extends MethodVisitor
 	{
-		public RenderModelFlatVisitor(int api, MethodVisitor mv)
+		public RenderModelFlatVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -66,6 +55,7 @@ public final class ForgeBlockModelRendererVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"ForgeBlockModelRendererVisitor.RenderModelFlatVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 3);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,
@@ -83,9 +73,9 @@ public final class ForgeBlockModelRendererVisitor extends ClassVisitor
 	
 	private static class RenderModelSmoothVisitor extends MethodVisitor
 	{
-		public RenderModelSmoothVisitor(int api, MethodVisitor mv)
+		public RenderModelSmoothVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -93,6 +83,7 @@ public final class ForgeBlockModelRendererVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"ForgeBlockModelRendererVisitor.RenderModelSmoothVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 3);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,

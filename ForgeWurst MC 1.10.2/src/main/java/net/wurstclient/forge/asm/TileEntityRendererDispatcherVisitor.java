@@ -12,39 +12,26 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class TileEntityRendererDispatcherVisitor extends ClassVisitor
+public final class TileEntityRendererDispatcherVisitor extends WurstClassVisitor
 {
-	private String render_name;
-	private String render_desc;
-	
-	public TileEntityRendererDispatcherVisitor(int api, ClassVisitor cv,
-		boolean obfuscated)
+	public TileEntityRendererDispatcherVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
+		super(cv);
 		
-		render_name = obfuscated ? "a" : "renderTileEntity";
-		render_desc = obfuscated ? "(Laqk;FI)V"
-			: "(Lnet/minecraft/tileentity/TileEntity;FI)V";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		String tileEntity = obf ? "aqk" : "net/minecraft/tileentity/TileEntity";
 		
-		if(name.equals(render_name) && desc.equals(render_desc))
-			return new RenderVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String render_name = obf ? "a" : "renderTileEntity";
+		String render_desc = "(L" + tileEntity + ";FI)V";
+		
+		registerMethodVisitor(render_name, render_desc,
+			mv -> new RenderVisitor(mv));
 	}
 	
 	private static class RenderVisitor extends MethodVisitor
 	{
-		public RenderVisitor(int api, MethodVisitor mv)
+		public RenderVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -52,6 +39,7 @@ public final class TileEntityRendererDispatcherVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"TileEntityRendererDispatcherVisitor.RenderVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 1);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,

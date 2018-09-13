@@ -12,56 +12,41 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class BlockLiquidVisitor extends ClassVisitor
+public final class BlockLiquidVisitor extends WurstClassVisitor
 {
-	private String iBlockState;
-	private String world;
-	private String blockPos;
 	private String axisAlignedBB;
 	
-	private String getCollisionBoundingBox_name;
-	private String getCollisionBoundingBox_desc;
 	private String FULL_BLOCK_AABB_name;
 	private String FULL_BLOCK_AABB_desc;
 	
-	public BlockLiquidVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public BlockLiquidVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		iBlockState =
-			obfuscated ? "ars" : "net/minecraft/block/state/IBlockState";
-		world = obfuscated ? "aid" : "net/minecraft/world/World";
-		blockPos = obfuscated ? "cm" : "net/minecraft/util/math/BlockPos";
-		axisAlignedBB =
-			obfuscated ? "bby" : "net/minecraft/util/math/AxisAlignedBB";
+		super(cv);
 		
-		getCollisionBoundingBox_name =
-			obfuscated ? "a" : "getCollisionBoundingBox";
-		getCollisionBoundingBox_desc = "(L" + iBlockState + ";L" + world + ";L"
-			+ blockPos + ";)L" + axisAlignedBB + ";";
-		FULL_BLOCK_AABB_name =
-			obfuscated ? "field_185505_j" : "FULL_BLOCK_AABB";
+		String iBlockState =
+			obf ? "ars" : "net/minecraft/block/state/IBlockState";
+		String world = obf ? "aid" : "net/minecraft/world/World";
+		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
+		axisAlignedBB = obf ? "bby" : "net/minecraft/util/math/AxisAlignedBB";
+		
+		String getCollisionBoundingBox_name =
+			obf ? "a" : "getCollisionBoundingBox";
+		String getCollisionBoundingBox_desc = "(L" + iBlockState + ";L" + world
+			+ ";L" + blockPos + ";)L" + axisAlignedBB + ";";
+		
+		FULL_BLOCK_AABB_name = obf ? "field_185505_j" : "FULL_BLOCK_AABB";
 		FULL_BLOCK_AABB_desc = "L" + axisAlignedBB + ";";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
 		
-		if(name.equals(getCollisionBoundingBox_name)
-			&& desc.equals(getCollisionBoundingBox_desc))
-			return new GetCollisionBoundingBoxVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		registerMethodVisitor(getCollisionBoundingBox_name,
+			getCollisionBoundingBox_desc,
+			mv -> new GetCollisionBoundingBoxVisitor(mv));
 	}
 	
 	private class GetCollisionBoundingBoxVisitor extends MethodVisitor
 	{
-		public GetCollisionBoundingBoxVisitor(int api, MethodVisitor mv)
+		public GetCollisionBoundingBoxVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override

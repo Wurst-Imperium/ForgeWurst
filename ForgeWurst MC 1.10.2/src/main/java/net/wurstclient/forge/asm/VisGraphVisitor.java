@@ -12,37 +12,26 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class VisGraphVisitor extends ClassVisitor
+public final class VisGraphVisitor extends WurstClassVisitor
 {
-	private String setOpaqueCube_name;
-	private String setOpaqueCube_desc;
-	
-	public VisGraphVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public VisGraphVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		setOpaqueCube_name = obfuscated ? "a" : "setOpaqueCube";
-		setOpaqueCube_desc =
-			obfuscated ? "(Lcm;)V" : "(Lnet/minecraft/util/math/BlockPos;)V";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(setOpaqueCube_name) && desc.equals(setOpaqueCube_desc))
-			return new SetOpaqueCubeVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String blockPos = obf ? "cm" : "net/minecraft/util/math/BlockPos";
+		
+		String setOpaqueCube_name = obf ? "a" : "setOpaqueCube";
+		String setOpaqueCube_desc = "(L" + blockPos + ";)V";
+		
+		registerMethodVisitor(setOpaqueCube_name, setOpaqueCube_desc,
+			mv -> new SetOpaqueCubeVisitor(mv));
 	}
 	
 	private static class SetOpaqueCubeVisitor extends MethodVisitor
 	{
-		public SetOpaqueCubeVisitor(int api, MethodVisitor mv)
+		public SetOpaqueCubeVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -50,6 +39,7 @@ public final class VisGraphVisitor extends ClassVisitor
 		{
 			System.out
 				.println("VisGraphVisitor.SetOpaqueCubeVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				"net/wurstclient/forge/compatibility/WEventFactory",

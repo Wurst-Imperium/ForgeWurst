@@ -12,7 +12,6 @@ import java.util.HashMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -75,8 +74,8 @@ public final class WClassTransformer implements IClassTransformer
 			ClassWriter writer = new ClassWriter(
 				ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 			ClassVisitor visitor = visitors.get(transformedName)
-				.getConstructor(int.class, ClassVisitor.class, boolean.class)
-				.newInstance(Opcodes.ASM4, writer, obfuscated);
+				.getConstructor(ClassVisitor.class, boolean.class)
+				.newInstance(writer, obfuscated);
 			reader.accept(visitor, 0);
 			return writer.toByteArray();
 			

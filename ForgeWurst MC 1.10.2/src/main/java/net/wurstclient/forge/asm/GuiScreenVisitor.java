@@ -12,37 +12,24 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class GuiScreenVisitor extends ClassVisitor
+public final class GuiScreenVisitor extends WurstClassVisitor
 {
-	private String sendChatMessage_name;
-	private String sendChatMessage_desc;
-	
-	public GuiScreenVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public GuiScreenVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
-		sendChatMessage_name = obfuscated ? "b" : "sendChatMessage";
-		sendChatMessage_desc = "(Ljava/lang/String;Z)V";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		super(cv);
 		
-		if(name.equals(sendChatMessage_name)
-			&& desc.equals(sendChatMessage_desc))
-			return new SendChatMessageVisitor(Opcodes.ASM4, mv);
-		else
-			return mv;
+		String sendChatMessage_name = obf ? "b" : "sendChatMessage";
+		String sendChatMessage_desc = "(Ljava/lang/String;Z)V";
+		
+		registerMethodVisitor(sendChatMessage_name, sendChatMessage_desc,
+			mv -> new SendChatMessageVisitor(mv));
 	}
 	
 	private static class SendChatMessageVisitor extends MethodVisitor
 	{
-		public SendChatMessageVisitor(int api, MethodVisitor mv)
+		public SendChatMessageVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -50,6 +37,7 @@ public final class GuiScreenVisitor extends ClassVisitor
 		{
 			System.out
 				.println("GuiScreenVisitor.SendChatMessageVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 1);
 			mv.visitMethodInsn(Opcodes.INVOKESTATIC,

@@ -12,46 +12,35 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class GuiNewChatVisitor extends ClassVisitor
+public final class GuiNewChatVisitor extends WurstClassVisitor
 {
-	private String printChatMessageWithOptionalDeletion_name;
-	private String printChatMessageWithOptionalDeletion_desc;
 	private String drawnChatLines_name;
 	
-	public GuiNewChatVisitor(int api, ClassVisitor cv, boolean obfuscated)
+	public GuiNewChatVisitor(ClassVisitor cv, boolean obf)
 	{
-		super(api, cv);
+		super(cv);
 		
-		printChatMessageWithOptionalDeletion_name =
-			obfuscated ? "a" : "printChatMessageWithOptionalDeletion";
-		printChatMessageWithOptionalDeletion_desc = obfuscated ? "(Lhh;I)V"
-			: "(Lnet/minecraft/util/text/ITextComponent;I)V";
+		String iTextComponent =
+			obf ? "hh" : "net/minecraft/util/text/ITextComponent";
 		
-		drawnChatLines_name = obfuscated ? "field_146253_i" : "drawnChatLines";
-	}
-	
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-		String signature, String[] exceptions)
-	{
-		MethodVisitor mv =
-			super.visitMethod(access, name, desc, signature, exceptions);
+		String printChatMessageWithOptionalDeletion_name =
+			obf ? "a" : "printChatMessageWithOptionalDeletion";
+		String printChatMessageWithOptionalDeletion_desc =
+			"(L" + iTextComponent + ";I)V";
 		
-		if(name.equals(printChatMessageWithOptionalDeletion_name)
-			&& desc.equals(printChatMessageWithOptionalDeletion_desc))
-			return new PrintChatMessageWithOptionalDeletionVisitor(Opcodes.ASM4,
-				mv);
-		else
-			return mv;
+		drawnChatLines_name = obf ? "field_146253_i" : "drawnChatLines";
+		
+		registerMethodVisitor(printChatMessageWithOptionalDeletion_name,
+			printChatMessageWithOptionalDeletion_desc,
+			mv -> new PrintChatMessageWithOptionalDeletionVisitor(mv));
 	}
 	
 	private class PrintChatMessageWithOptionalDeletionVisitor
 		extends MethodVisitor
 	{
-		public PrintChatMessageWithOptionalDeletionVisitor(int api,
-			MethodVisitor mv)
+		public PrintChatMessageWithOptionalDeletionVisitor(MethodVisitor mv)
 		{
-			super(api, mv);
+			super(Opcodes.ASM4, mv);
 		}
 		
 		@Override
@@ -59,6 +48,7 @@ public final class GuiNewChatVisitor extends ClassVisitor
 		{
 			System.out.println(
 				"GuiNewChatVisitor.PrintChatMessageWithOptionalDeletionVisitor.visitCode()");
+			
 			super.visitCode();
 			mv.visitTypeInsn(Opcodes.NEW,
 				"net/wurstclient/fmlevents/WChatInputEvent");
