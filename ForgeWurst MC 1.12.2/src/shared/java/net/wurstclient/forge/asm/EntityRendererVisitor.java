@@ -25,7 +25,8 @@ public final class EntityRendererVisitor extends WurstClassVisitor
 		String setupCameraTransform_name = obf ? "a" : "setupCameraTransform";
 		String setupCameraTransform_desc = "(FI)V";
 		
-		viewBobbing_name = obf ? "f" : "viewBobbing";
+		viewBobbing_name =
+			obf ? mcVersion.isLowerThan("1.11") ? "e" : "f" : "viewBobbing";
 		
 		registerMethodVisitor(hurtCameraEffect_name, hurtCameraEffect_desc,
 			mv -> new HurtCameraEffectVisitor(mv));
