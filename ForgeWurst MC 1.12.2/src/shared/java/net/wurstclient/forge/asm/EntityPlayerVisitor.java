@@ -18,7 +18,8 @@ public final class EntityPlayerVisitor extends WurstClassVisitor
 	{
 		super(cv);
 		
-		String jump_name = obf ? "cl" : "jump";
+		String jump_name =
+			obf ? mcVersion.isLowerThan("1.11") ? "cl" : "cu" : "jump";
 		String jump_desc = "()V";
 		
 		registerMethodVisitor(jump_name, jump_desc, mv -> new JumpVisitor(mv));
