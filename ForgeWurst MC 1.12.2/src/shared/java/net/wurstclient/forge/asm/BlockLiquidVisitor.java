@@ -24,8 +24,8 @@ public final class BlockLiquidVisitor extends WurstClassVisitor
 		super(cv);
 		
 		String iBlockState = unmap("net/minecraft/block/state/IBlockState");
-		String iBlockAccess = unmap(mcVersion.isHigherThan("1.10.2")
-			? "net/minecraft/world/IBlockAccess" : "net/minecraft/world/World");
+		String iBlockAccess = unmap(mcVersion.isLowerThan("1.11")
+			? "net/minecraft/world/World" : "net/minecraft/world/IBlockAccess");
 		String blockPos = unmap("net/minecraft/util/math/BlockPos");
 		axisAlignedBB = unmap("net/minecraft/util/math/AxisAlignedBB");
 		
