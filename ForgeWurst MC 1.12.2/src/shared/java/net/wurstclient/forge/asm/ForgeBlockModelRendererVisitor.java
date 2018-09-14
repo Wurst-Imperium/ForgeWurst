@@ -23,14 +23,15 @@ public final class ForgeBlockModelRendererVisitor extends WurstClassVisitor
 			unmap("net/minecraft/client/renderer/block/model/IBakedModel");
 		String iBlockState = unmap("net/minecraft/block/state/IBlockState");
 		String blockPos = unmap("net/minecraft/util/math/BlockPos");
-		String vertexBuffer =
-			unmap("net/minecraft/client/renderer/VertexBuffer");
+		String bufferBuilder = unmap(
+			"net/minecraft/client/renderer/" + (mcVersion.isLowerThan("1.12")
+				? "VertexBuffer" : "BufferBuilder"));
 		
 		String renderModelFlat_name = obf ? "c" : "renderModelFlat";
 		String renderModelSmooth_name = obf ? "b" : "renderModelSmooth";
 		String renderModel_desc = "(L" + iBlockAccess + ";" + "L" + iBakedModel
 			+ ";" + "L" + iBlockState + ";" + "L" + blockPos + ";" + "L"
-			+ vertexBuffer + ";ZJ)Z";
+			+ bufferBuilder + ";ZJ)Z";
 		
 		registerMethodVisitor(renderModelFlat_name, renderModel_desc,
 			mv -> new RenderModelFlatVisitor(mv));
