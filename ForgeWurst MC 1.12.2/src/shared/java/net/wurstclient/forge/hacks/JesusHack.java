@@ -126,7 +126,7 @@ public final class JesusHack extends Hack
 			y += 0.05;
 		
 		// create new packet
-		Packet newPacket;
+		Packet<?> newPacket;
 		if(packet instanceof CPacketPlayer.Position)
 			newPacket = new CPacketPlayer.Position(x, y, z, true);
 		else

@@ -16,7 +16,7 @@ import net.wurstclient.forge.ForgeWurst;
 import net.wurstclient.forge.clickgui.ComboBox;
 import net.wurstclient.forge.clickgui.Component;
 
-public final class EnumSetting<T extends Enum> extends Setting
+public final class EnumSetting<T extends Enum<?>> extends Setting
 {
 	private final T[] values;
 	private T selected;

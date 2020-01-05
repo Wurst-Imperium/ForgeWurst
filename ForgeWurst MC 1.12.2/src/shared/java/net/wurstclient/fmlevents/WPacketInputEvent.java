@@ -14,14 +14,14 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 @Cancelable
 public final class WPacketInputEvent extends Event
 {
-	private final Packet packet;
+	private final Packet<?> packet;
 	
-	public WPacketInputEvent(Packet packet)
+	public WPacketInputEvent(Packet<?> packet)
 	{
 		this.packet = packet;
 	}
 	
-	public Packet getPacket()
+	public Packet<?> getPacket()
 	{
 		return packet;
 	}

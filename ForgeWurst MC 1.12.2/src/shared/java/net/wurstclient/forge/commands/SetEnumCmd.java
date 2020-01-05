@@ -39,7 +39,7 @@ public final class SetEnumCmd extends Command
 		if(!(setting instanceof EnumSetting))
 			throw new CmdError(
 				hack.getName() + " " + setting.getName() + " is not an enum.");
-		EnumSetting e = (EnumSetting)setting;
+		EnumSetting<?> e = (EnumSetting<?>)setting;
 		
 		e.setSelected(args[2].replace("_", " "));
 	}

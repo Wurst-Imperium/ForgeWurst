@@ -57,7 +57,7 @@ public final class WEventFactory
 		return !MinecraftForge.EVENT_BUS.post(event);
 	}
 	
-	public static Packet onSendPacket(Packet<?> packet)
+	public static Packet<?> onSendPacket(Packet<?> packet)
 	{
 		WPacketOutputEvent event = new WPacketOutputEvent(packet);
 		return MinecraftForge.EVENT_BUS.post(event) ? null : event.getPacket();

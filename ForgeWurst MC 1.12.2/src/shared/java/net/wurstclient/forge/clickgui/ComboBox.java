@@ -18,11 +18,11 @@ import net.wurstclient.forge.settings.EnumSetting;
 
 public final class ComboBox extends Component
 {
-	private final EnumSetting setting;
+	private final EnumSetting<?> setting;
 	private final int popupWidth;
 	private ComboBoxPopup popup;
 	
-	public ComboBox(EnumSetting setting)
+	public ComboBox(EnumSetting<?> setting)
 	{
 		this.setting = setting;
 		
@@ -189,9 +189,9 @@ public final class ComboBox extends Component
 			if(mouseButton != 0)
 				return;
 			
-			Enum[] values = ((ComboBox)getOwner()).setting.getValues();
+			Enum<?>[] values = ((ComboBox)getOwner()).setting.getValues();
 			int yi1 = getY() - 11;
-			for(Enum value : values)
+			for(Enum<?> value : values)
 			{
 				if(value == ((ComboBox)getOwner()).setting.getSelected())
 					continue;
@@ -234,9 +234,9 @@ public final class ComboBox extends Component
 			GL11.glVertex2i(x2, y1);
 			GL11.glEnd();
 			
-			Enum[] values = ((ComboBox)getOwner()).setting.getValues();
+			Enum<?>[] values = ((ComboBox)getOwner()).setting.getValues();
 			int yi1 = y1 - 11;
-			for(Enum value : values)
+			for(Enum<?> value : values)
 			{
 				if(value == ((ComboBox)getOwner()).setting.getSelected())
 					continue;
