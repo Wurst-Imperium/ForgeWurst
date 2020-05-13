@@ -141,7 +141,7 @@ public final class ItemEspHack extends Hack
 			if(style.getSelected().boxes)
 				GL11.glCallList(itemBox);
 			
-			if(names.isChecked())
+			if(names.isChecked() && mc.getRenderManager().options != null)
 			{
 				ItemStack stack = WItem.getItemStack(e);
 				EntityRenderer.drawNameplate(WMinecraft.getFontRenderer(),
